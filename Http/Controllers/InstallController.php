@@ -6,10 +6,11 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Modules\Core\Entities\Admin;
-use Modules\System\DotenvEditor;
+use Modules\System\Facades\DotenvEditor;
 use Modules\System\Http\Requests\UpdateDatabaseRequest;
 use Throwable;
 
@@ -17,15 +18,15 @@ class InstallController extends Controller
 {
     protected $request;
 
-    public function __construct(Request $request, DotenvEditor $env)
+    public function __construct(Request $request)
     {
         $this->request = $request;
-        $this->env  = $env->load();
     }
 
     public function index()
     {
-        $data = $this->env->getKeys(['DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD']);
+        $env  = DotenvEditor::load();
+        $data = $env->getKeys(['DB_HOST', 'DB_PORT', 'DB_DATABASE', 'DB_USERNAME', 'DB_PASSWORD']);
 
         if($this->request->session()->has('install_success')) {
             //Create install file in storage
@@ -53,9 +54,11 @@ class InstallController extends Controller
         })
         ->values()
         ->toArray();
-
+        
         //Save settings
-        $this->env->setKeys($data);
+        $env  = DotenvEditor::load();
+        $env->setKeys($data);
+        $env->save();
 
         //Check conncetion
         try {
@@ -63,12 +66,12 @@ class InstallController extends Controller
             if(!DB::connection()->getDatabaseName()){
                 return redirect()
                 ->back()
-                ->withErrors('db_host', __('system::messages.db_database_failed', ['db' => $request->db_database]));
+                ->withErrors(['db_database' => [__('system::messages.db_database_failed', ['db' => $request->db_database])]]);
             }
         } catch (Throwable $e) {
             return redirect()
             ->back()
-            ->withErrors('db_host', __('system::messages.db_connection_failed'));
+            ->withErrors(['db_host' => [__('system::messages.db_connection_failed')]]);
         }
 
         //Run migration & seed

@@ -19,9 +19,9 @@ class UpdateDatabaseRequest extends FormRequest
             'db_database' => 'required|max:50',
             'db_username' => 'required|max:255',
             'db_password' => 'required|max:255',
-            'admin_username' => 'required|min:6|max:30|unique:admins,username',
+            'admin_username' => 'required|min:6|max:30',
             'admin_password' => 'required|min:6|max:30',
-            'admin_email'    => 'required|email|unique:admins,email'
+            'admin_email'    => 'required|email'
         ];
     }
 
