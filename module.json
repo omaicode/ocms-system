@@ -1,0 +1,16 @@
+{
+    "name": "System",
+    "alias": "system",
+    "type": "composer",
+    "description": "System module for OCMS",
+    "keywords": [],
+    "priority": 1,
+    "providers": [
+        "Modules\\System\\Providers\\SystemServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": [
+        "./helpers.php"
+    ]
+}
