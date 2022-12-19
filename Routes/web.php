@@ -11,7 +11,9 @@
 |
 */
 
-Route::prefix('installer')->as('system.install.')->group(function() {
+use Modules\Core\Http\Middleware\EnsureAppInstalled;
+
+Route::prefix('installer')->as('system.install.')->middleware(EnsureAppInstalled::class)->group(function() {
     Route::get('/', 'InstallController@index')->name('index');
     Route::post('/', 'InstallController@setup')->name('setup');
 });
